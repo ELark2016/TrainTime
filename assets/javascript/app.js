@@ -1,86 +1,87 @@
-  // Initialize Firebase
-  var config = {
-    apiKey: "AIzaSyAHJfMuyr5aF3IwiEj96RsOkkpPGLCPf8s",
-    authDomain: "liz-ur-bootcamp-demo.firebaseapp.com",
-    databaseURL: "https://liz-ur-bootcamp-demo.firebaseio.com",
-    projectId: "liz-ur-bootcamp-demo",
-    storageBucket: "liz-ur-bootcamp-demo.appspot.com",
-    messagingSenderId: "1064241818851"
-  };
-  firebase.initializeApp(config);
-
+// Initialize Firebase
+var config = {
+  apiKey: "AIzaSyAHJfMuyr5aF3IwiEj96RsOkkpPGLCPf8s",
+  authDomain: "liz-ur-bootcamp-demo.firebaseapp.com",
+  databaseURL: "https://liz-ur-bootcamp-demo.firebaseio.com",
+  projectId: "liz-ur-bootcamp-demo",
+  storageBucket: "liz-ur-bootcamp-demo.appspot.com",
+  messagingSenderId: "1064241818851"
+};
+firebase.initializeApp(config);
 
 // Create a variable to reference the database.
 var database = firebase.database();
 
-// Initial Values
+// Set initial values to empty strings
 var name = "";
 var destination = "";
 var time = "";
 var frequency = "";
+var tMinutesTillTrain = "";
+var nextTrain = "";
+var nextTrainConverted;
 
-// var createRow = function(data) {
-//     // Get reference to existing tbody element, create a new table row element
-//     var tBody = $("tbody");
-//     var tRow = $("<tr>");
-
-//     // Methods run on jQuery selectors return the selector they we run on
-//     // This is why we can create and save a reference to a td in the same statement we update its text
-//     var titleTd = $("<td>").text(data.Title);
-//     var yearTd = $("<td>").text(data.Year);
-//     var actorsTd = $("<td>").text(data.Actors);
-//     // Append the newly created table data to the table row
-//     tRow.append(titleTd, yearTd, actorsTd);
-//     // Append the table row to the table body
-//     tBody.append(tRow);
-//   }
+function createRow() {
+  var tBody = $("tbody");
+  var tRow = $("<tr>");
+  var nameTd = $("<td>").text(name);
+  var destinationTd = $("<td>").text(destination);
+  var frequencyTd = $("<td>").text(frequency);
+  var nextTrainTd = $("<td>").text(moment(nextTrain).format("hh:mm a"));
+  var minutesAwayTd = $("<td>").text(tMinutesTillTrain);
+  
+  // Append the newly created table data to the table row
+  tRow.append(nameTd, destinationTd, frequencyTd, nextTrainTd, minutesAwayTd);
+  // Append the table row to the table body
+  tBody.append(tRow);
+}
 
 // Capture Button Click
 $("#add-schedule").on("click", function(event) {
   event.preventDefault();
-  
-  // Grabbed values from text-boxes
+
   name = $("#name-input").val().trim();
   destination = $("#destination-input").val().trim();
   time = $("#time-input").val().trim();
   frequency = $("#frequency-input").val().trim();
 
-  // Code for "Setting values in the database"
+  var timeConverted = moment(time, "HH:mm").subtract(1, "years");
+  console.log(timeConverted);
+
+  var currentTime = moment();
+  console.log("CURRENT TIME: " + moment(currentTime).format("hh:mm"));
+
+  var diffTime = moment().diff(moment(timeConverted), "minutes");
+  console.log("DIFFERENCE IN TIME: " + diffTime);
+
+  var tRemainder = diffTime % frequency;
+  console.log(tRemainder);
+
+  tMinutesTillTrain = frequency - tRemainder;
+  console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
+  
+  nextTrain = moment().add(tMinutesTillTrain, "minutes");
+  console.log("ARRIVAL TIME: " + moment(nextTrain).format("hh:mm"));
+  
+  createRow();
+
+  // Set values in the database"
   database.ref().push({
     name: name,
     destination: destination,
     time: time, 
     frequency: frequency,
-
   });
-
 });
-
 // Firebase watcher + initial loader HINT: .on("value")
 database.ref().on("child_added", function(childSnapshot) {
-
   // Log everything that's coming out of snapshot
   console.log(childSnapshot.val());
   console.log(childSnapshot.val().name);
   console.log(childSnapshot.val().destination);
   console.log(childSnapshot.val().time);
   console.log(childSnapshot.val().frequency);
-
-  // Change the HTML to reflect
-  $("#name-display").text(childSnapshot.val().name);
-  $("#destination-display").text(childSnapshot.val().destination);
-  $("#time-display").text(childSnapshot.val().time);
-  $("#frequency-display").text(childSnapshot.val().frequency);
-
-  // full list of items to the well
-//   $("#full-member-list").append("<div class='well'><span class='member-name'> " + childSnapshot.val().name +
-//   " </span><span class='member-email'> " + childSnapshot.val().email +
-//   " </span><span class='member-age'> " + childSnapshot.val().age +
-//   " </span><span class='member-comment'> " + childSnapshot.val().comment + " </span></div>");
-
-// also see Train Predictions Activity #21
-
   // Handle the errors
-}, function(errorObject) {
-  console.log("Errors handled: " + errorObject.code);
+  }, function(errorObject) {
+    console.log("Errors handled: " + errorObject.code);
 });

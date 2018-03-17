@@ -10,8 +10,11 @@
   <!-- Bootstrap -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 
-  <!-- LINK TO FIREBASE GOES HERE -->
+  <!-- LINK TO FIREBASE -->
   <script src="https://www.gstatic.com/firebasejs/4.11.0/firebase.js"></script>
+
+  <!-- LINK TO MOMENT JS -->
+  <script src="https://cdn.jsdelivr.net/momentjs/2.12.0/moment.min.js"></script>
 
 </head>
 
@@ -46,14 +49,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                    <th scope="row">1</th>
-                    <td id="name-display">tbd</td>
-                    <td id="time-display">tbd</td>
-                    <td id="destination-display">tbd</td>
-                    <td id="frequency-display">tbd</td>
-                    </tr>
-                    
+                    <!-- Dynamically created rows for train schedule go here -->
                 </tbody>
             </table>
         </div>
@@ -81,7 +77,7 @@
                 <input class="form-control" id="destination-input" type="text">
               </div>
               <div class="form-group">
-                <label for="time-input">First Train Time (hh:mm - military time)</label>
+                <label for="time-input">First Train Time (HH:mm - military time)</label>
                 <input class="form-control" id="time-input" type="time">
               </div>
               <div class="form-group">
